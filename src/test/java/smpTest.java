@@ -8,7 +8,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -18,32 +17,40 @@ import java.util.List;
 public class smpTest
 {
     static WebDriver driver;
-    String TAB_favourites = "//span[@id='favorite']";
+    String TAB_add_favourites = "//span[@id='favorite']";
+    String TAB_save = "//div[@id='gwt-debug-apply']";
+    String Tab_favourites = "//div[@id='gwt-debug-adminArea']/div[2]";
+    String Tab_edit_favorites = "//span[@id='gwt-debug-editFavorites']";
+    String TAB_cross_icon = "//table[@id='gwt-debug-favoritesEditTable']/tbody/tr/td[6]/div/span";
+    String TAB_confirm_delete = "//div[@id='gwt-debug-YES']";
+    String TAB_save_changes = "//div[@id='gwt-debug-apply']";
+    String TAB_exit = "//a[contains(text(),'Выйти')]";
+
 
     @BeforeAll
     public static void setUp() throws InterruptedException {
+
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().setSize(new Dimension(1920,1080));
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+
     }
 
     @Test
-    public void addObject() throws InterruptedException
-    {
+    public void addObject() throws InterruptedException {
+
         login();
 
         //Кликаем на иконку  добавить в избранное
-        click(TAB_favourites);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+        click(TAB_add_favourites);
 
         //Кликаем на кнопку сохранить
-        driver.findElement(By.xpath("//div[@id='gwt-debug-apply']")).click();
+        click(TAB_save);
         Thread.sleep(2000);
 
         //Открываем вкладу избранное (почему-то в селениуме она открыты априори при запуске сайта)
-        driver.findElement(By.xpath("//div[@id='gwt-debug-adminArea']/div[2]")).click();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+        click(Tab_favourites);
 
         //Проверки
         WebElement element = driver.findElement(By.xpath("//a[@id='gwt-debug-title']/div"));
@@ -53,24 +60,20 @@ public class smpTest
 
         //Очистка
 
-        //Открываем редактирование избранного
-        driver.findElement(By.xpath("//span[@id='gwt-debug-editFavorites']")).click();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+            //Открываем редактирование избранного
+            click(Tab_edit_favorites);
 
-        //Нажимамем на крестик
-        driver.findElement(By.xpath("//table[@id='gwt-debug-favoritesEditTable']/tbody/tr/td[6]/div/span")).click();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+            //Нажимамем на крестик
+             click(TAB_cross_icon);
 
-        //Подтверждаем удаление
-        driver.findElement(By.xpath("//div[@id='gwt-debug-YES']")).click();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+            //Подтверждаем удаление
+            click(TAB_confirm_delete);
 
-        //Сохраняем изменения
-        driver.findElement(By.xpath("//div[@id='gwt-debug-apply']")).click();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+            //Сохраняем изменения
+            click(TAB_save_changes);
 
-        driver.findElement(By.xpath("//a[contains(text(),'Выйти')]")).click();
-
+        //Разлогиниться
+        click(TAB_exit);
     }
 
 
@@ -78,42 +81,39 @@ public class smpTest
     public void deleteObject() throws InterruptedException {
 
         login();
+
         //Кликаем на иконку  добавить в избранное
-        click(TAB_favourites);
-        Thread.sleep(2000);
+        click(TAB_add_favourites);
 
         //Кликаем на кнопку сохранить
-        driver.findElement(By.xpath("//div[@id='gwt-debug-apply']")).click();
+        click(TAB_save);
         Thread.sleep(2000);
 
         //Открываем вкладу избранное (почему-то в селениуме она открыты априори при запуске сайта)
-        driver.findElement(By.xpath("//div[@id='gwt-debug-adminArea']/div[2]")).click();
-        Thread.sleep(2000);
+        click(Tab_favourites);
 
         //Открываем редактирование избранного
-        driver.findElement(By.xpath("//span[@id='gwt-debug-editFavorites']")).click();
-        Thread.sleep(2000);
+        click(Tab_edit_favorites);
 
         //Нажимамем на крестик
-        driver.findElement(By.xpath("//table[@id='gwt-debug-favoritesEditTable']/tbody/tr/td[6]/div/span")).click();
-        Thread.sleep(2000);
+        click(TAB_cross_icon);
 
         //Подтверждаем удаление
-        driver.findElement(By.xpath("//div[@id='gwt-debug-YES']")).click();
-        Thread.sleep(2000);
+        click(TAB_confirm_delete);
 
         //Сохраняем изменения
-        driver.findElement(By.xpath("//div[@id='gwt-debug-apply']")).click();
+        click(TAB_save_changes);
         Thread.sleep(2000);
 
         //Проверки
         List<WebElement> element = driver.findElements(By.xpath("//a[@id='gwt-debug-title']/div"));
         Assertions.assertTrue(element.isEmpty(), "Объект не удалился");
 
-        driver.findElement(By.xpath("//div[2]/div[2]/div")).click();
+        //Закрываем вкладу избранного
+        click("//div[2]/div[2]/div");
 
         //Разлогиниться
-        driver.findElement(By.xpath("//a[contains(text(),'Выйти')]")).click();
+        click(TAB_exit);
 
     }
 
@@ -128,7 +128,7 @@ public class smpTest
     }
     public WebElement waitElement(String xpath)
     {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         WebElement element = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
         return element;
     }
